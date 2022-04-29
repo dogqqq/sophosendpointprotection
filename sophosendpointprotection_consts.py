@@ -48,6 +48,8 @@ SOPHOS_PARAMS_ENDPOINTLOCKDOWN = [
 JWT_TOKEN_ENDPOINT = "https://id.sophos.com/api/v2/oauth2/token"
 WHOAMI_ENDPOINT = "https://api.central.sophos.com/whoami/v1"
 
+# https://api.central.sophos.com/{organization|partner}
+TENANTS_ENDPOINT = "/v1/tenants?pageTotal=true"
 ENDPOINTS_ENDPOINT = "/endpoint/v1/endpoints"
 ENDPOINTS_SETTINGS = "/endpoint/v1/settings"
 TAMPER_PROTECTION_ENDPOINT = ENDPOINTS_ENDPOINT + "/{}/tamper-protection"
