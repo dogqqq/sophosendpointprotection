@@ -163,7 +163,6 @@ class SophosEndpointProtectionConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
-            # self.save_progress("Request function results: {}".format(r.text))
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR,
                 ('Error connecting to server. Details: {0}').format(str(e))), resp_json)
@@ -191,30 +190,26 @@ class SophosEndpointProtectionConnector(BaseConnector):
 
         # Get tenants when id_type is "Organization" or "Partner"
         if self._id_type != "tenant":
-            self.save_progress("[Debugging] Enter Orginization/Partner condition, fetching tenants list")
+            self.save_progress("[Enter Orginization/Partner condition, fetching tenants list")
             tenant_url = "{0}{1}{2}".format("https://api.central.sophos.com/", self._id_type, TENANTS_ENDPOINT)
-            self.save_progress("[Debugging] List tenants api: {}".format(tenant_url))
             headers.update({
                 'Authorization': ('Bearer {}'.format(self._JWT_token)),
                 '{}'.format(id_to_xid[self._id_type]): '{}'.format(self._partner_token),
                 'Content-Type': 'application/json'
             })
-            self.save_progress("[Debugging] Organization/Partner tenant request header: {}".format(headers))
             ret_val, resp_json = self._make_rest_call(tenant_url, action_result, headers, params, data, json, method)
-            self.save_progress("[Debugging] Tenant Response: {}".format(resp_json))
             # Get first tenant directly
             self._tenant_token = resp_json["items"][0]["id"]
             self._base_url = resp_json["items"][0]["apiHost"]
             url = ("{0}{1}").format(self._base_url, endpoint)
-            self.save_progress("[Debugging] tenant_token: {} / base_url: {}".format(self._tenant_token, self._base_url))
 
-        self.save_progress("[Debugging] Endpoint api: {}".format(url))
         # Fetch endpoint data
-        headers.update({
+        headers = {
             'Authorization': ('Bearer {}'.format(self._JWT_token)),
             'X-Tenant-ID': '{}'.format(self._tenant_token),
             'Content-Type': 'application/json'
-        })
+        }
+
         self.save_progress("Trying to fetch data from the endpoint")
         ret_val, resp_json = self._make_rest_call(url, action_result, headers, params, data, json, method)
         self.save_progress(("Response in JSON: {}".format(str(resp_json))))
