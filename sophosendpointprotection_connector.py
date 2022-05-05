@@ -54,7 +54,11 @@ class SophosEndpointProtectionConnector(BaseConnector):
         self._client_id = config[SOPHOS_CLIENT_ID].encode('utf-8')
         self._client_secret = config[SOPHOS_CLIENT_SECRET].encode('utf-8')
         self._state = self.load_state()
+
+        action_result = self.add_action_result(ActionResult({}))
+        self._get_token(action_result)
         self._JWT_token = self._state.get(SOPHOS_JWT_JSON, {}).get(SOPHOS_JWT_TOKEN)
+
         pt_json = self._state.get(SOPHOS_PT_JSON, None)
         # self.save_progress("Printing the pt_json: ".format(str(json.dumps(pt_json))))
         if pt_json is not None:
@@ -190,7 +194,7 @@ class SophosEndpointProtectionConnector(BaseConnector):
 
         # Get tenants when id_type is "Organization" or "Partner"
         if self._id_type != "tenant":
-            self.save_progress("[Enter Orginization/Partner condition, fetching tenants list")
+            self.save_progress("[Enter Orginization/Partner condition, fetching tenants list]")
             tenant_url = "{0}{1}{2}".format("https://api.central.sophos.com/", self._id_type, TENANTS_ENDPOINT)
             headers.update({
                 'Authorization': ('Bearer {}'.format(self._JWT_token)),
@@ -252,7 +256,6 @@ class SophosEndpointProtectionConnector(BaseConnector):
             'scope': 'token',
             'grant_type': 'client_credentials'
         }
-        # self.save_progress("Data: {}".format(json.dumps(data)))
         headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json'}
         url = ("{}".format(JWT_TOKEN_ENDPOINT))
         self.save_progress(("Fetching the JWT token"))
